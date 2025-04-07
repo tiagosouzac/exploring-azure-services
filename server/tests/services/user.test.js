@@ -1,7 +1,7 @@
 import { expect, it, vi } from "vitest";
-import bcrypt from "bcrypt";
 import { User } from "../../models/user.js";
 import { UserService } from "../../services/user.service.js";
+import { HashService } from "../../services/hash.service.js";
 import { UserRepository } from "../../repositories/user.repository.js";
 import { NotFoundException } from "../../exceptions/not-found.js";
 import { ConflictException } from "../../exceptions/conflict.js";
@@ -29,25 +29,27 @@ vi.mock("../../repositories/user.repository.js", () => {
   return { UserRepository: UserRepositoryMock };
 });
 
-vi.mock("bcrypt", () => {
-  const bcryptMock = vi.fn();
-  bcryptMock.prototype.hash = vi.fn(() => "hashed_password");
+vi.mock("../../services/hash.service.js", () => {
+  const HashServiceMock = vi.fn();
+  HashServiceMock.prototype.hashPassword = vi.fn(() => "hashed_password");
+  HashServiceMock.prototype.comparePassword = vi.fn(() => true);
 
-  return { default: { hash: bcryptMock.prototype.hash } };
+  return { HashService: HashServiceMock };
 });
 
-const service = new UserService();
+const userService = new UserService();
+const hashService = new HashService();
 
 describe("[Model] User", () => {
   it("should return a user by id", async () => {
-    await expect(service.findById(1)).resolves.toEqual(user);
+    await expect(userService.findById(1)).resolves.toEqual(user);
     expect(UserRepository.prototype.findById).toHaveBeenCalledWith(1);
   });
 
   it("should throw NotFoundException when user is not found", async () => {
     UserRepository.prototype.findById.mockReturnValueOnce(null);
 
-    await expect(service.findById(999)).rejects.toThrow(NotFoundException);
+    await expect(userService.findById(999)).rejects.toThrow(NotFoundException);
     expect(UserRepository.prototype.findById).toHaveBeenCalledWith(999);
   });
 
@@ -55,7 +57,7 @@ describe("[Model] User", () => {
     UserRepository.prototype.findByEmail.mockReturnValueOnce(null);
 
     const newUser = new User(payload);
-    const result = await service.save(newUser);
+    const result = await userService.save(newUser);
 
     expect(result).toEqual(user);
     expect(UserRepository.prototype.save).toHaveBeenCalledWith(newUser);
@@ -65,14 +67,14 @@ describe("[Model] User", () => {
     UserRepository.prototype.findByEmail.mockReturnValueOnce(null);
 
     const newUser = new User(payload);
-    await service.save(newUser);
+    await userService.save(newUser);
 
-    expect(bcrypt.hash).toHaveBeenCalledWith(payload.password, 10);
+    expect(hashService.hashPassword).toHaveBeenCalledWith(payload.password);
   });
 
   it("should throw ConflictException when user already exists", async () => {
     const newUser = new User(payload);
-    await expect(service.save(newUser)).rejects.toThrow(ConflictException);
+    await expect(userService.save(newUser)).rejects.toThrow(ConflictException);
     expect(UserRepository.prototype.findByEmail).toHaveBeenCalledWith(
       user.email
     );
