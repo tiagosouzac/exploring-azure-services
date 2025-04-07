@@ -1,4 +1,4 @@
-import { Database, db } from "../infra/db.js";
+import { Database } from "../infra/db.js";
 
 class UserRepository {
   #db = new Database();

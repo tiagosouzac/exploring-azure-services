@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import bcrypt from "bcrypt";
 import { User } from "../../models/user.js";
 import { UserService } from "../../services/user.service.js";
 import { UserRepository } from "../../repositories/user.repository.js";
@@ -28,6 +29,13 @@ vi.mock("../../repositories/user.repository.js", () => {
   return { UserRepository: UserRepositoryMock };
 });
 
+vi.mock("bcrypt", () => {
+  const bcryptMock = vi.fn();
+  bcryptMock.prototype.hash = vi.fn(() => "hashed_password");
+
+  return { default: { hash: bcryptMock.prototype.hash } };
+});
+
 const service = new UserService();
 
 describe("[Model] User", () => {
@@ -51,6 +59,15 @@ describe("[Model] User", () => {
 
     expect(result).toEqual(user);
     expect(UserRepository.prototype.save).toHaveBeenCalledWith(newUser);
+  });
+
+  it("should hash the password before saving", async () => {
+    UserRepository.prototype.findByEmail.mockReturnValueOnce(null);
+
+    const newUser = new User(payload);
+    await service.save(newUser);
+
+    expect(bcrypt.hash).toHaveBeenCalledWith(payload.password, 10);
   });
 
   it("should throw ConflictException when user already exists", async () => {
