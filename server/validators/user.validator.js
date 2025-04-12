@@ -14,7 +14,7 @@ class UserValidator {
   }
 
   findById(data) {
-    return this.#schema.pick({ id: true }).parse(data);
+    return this.#schema.pick({ id: true }).required().parse(data);
   }
 }
 
