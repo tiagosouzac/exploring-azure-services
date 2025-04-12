@@ -1,4 +1,3 @@
-import { expect, it, vi } from "vitest";
 import request from "supertest";
 import { app } from "../../index.js";
 import { UserService } from "../../services/user.service.js";
@@ -86,6 +85,21 @@ describe("[Controller] Users", async () => {
     expect(response.body.data).toHaveProperty("email");
     expect(response.body.data).toHaveProperty("role");
     expect(response.body.data.password).toBeUndefined();
+  });
+
+  it("should return 400 when validation to create a new user fails", async () => {
+    const response = await request(app).post("/api/v1/users").send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body.status).toBe("error");
+    expect(response.body.message).toBe(
+      "Validation failed. Please check the provided data."
+    );
+    expect(Array.isArray(response.body.errors)).toBe(true);
+    response.body.errors.forEach((error) => {
+      expect(error).toHaveProperty("field");
+      expect(error).toHaveProperty("message");
+    });
   });
 
   it("should return a 409 error when user already exists", async () => {

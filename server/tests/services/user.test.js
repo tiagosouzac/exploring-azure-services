@@ -1,4 +1,3 @@
-import { expect, it, vi } from "vitest";
 import { User } from "../../models/user.js";
 import { UserService } from "../../services/user.service.js";
 import { HashService } from "../../services/hash.service.js";
@@ -40,7 +39,7 @@ vi.mock("../../services/hash.service.js", () => {
 const userService = new UserService();
 const hashService = new HashService();
 
-describe("[Model] User", () => {
+describe("[Service] User", () => {
   it("should return a user by id", async () => {
     await expect(userService.findById(1)).resolves.toEqual(user);
     expect(UserRepository.prototype.findById).toHaveBeenCalledWith(1);
@@ -66,15 +65,15 @@ describe("[Model] User", () => {
   it("should hash the password before saving", async () => {
     UserRepository.prototype.findByEmail.mockReturnValueOnce(null);
 
-    const newUser = new User(payload);
-    await userService.save(newUser);
+    await userService.save(new User(payload));
 
     expect(hashService.hashPassword).toHaveBeenCalledWith(payload.password);
   });
 
   it("should throw ConflictException when user already exists", async () => {
-    const newUser = new User(payload);
-    await expect(userService.save(newUser)).rejects.toThrow(ConflictException);
+    await expect(userService.save(new User(payload))).rejects.toThrow(
+      ConflictException
+    );
     expect(UserRepository.prototype.findByEmail).toHaveBeenCalledWith(
       user.email
     );

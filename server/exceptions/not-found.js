@@ -1,5 +1,5 @@
 class NotFoundException extends Error {
-  constructor(message = "Resource not found") {
+  constructor(message = "Not found") {
     super(message);
     this.name = "NotFound";
     this.statusCode = 404;
