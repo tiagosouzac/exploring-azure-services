@@ -13,7 +13,6 @@ class UserController {
 
   async show(request, response) {
     const result = this.#validator.findById(request.query);
-    console.log(result);
     const user = await this.#service.findById(result.id);
 
     response.json({

@@ -4,6 +4,7 @@ import cors from "cors";
 import { exceptionHandler } from "./middlewares/exception-handler.js";
 import { userRoutes } from "./routes/user.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
+import { ticketRoutes } from "./routes/ticket.routes.js";
 
 dotenv.config({ path: ".env.development" });
 
@@ -16,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/tickets", ticketRoutes);
 
 // Exception Handler
 app.use(exceptionHandler);

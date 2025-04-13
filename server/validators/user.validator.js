@@ -10,7 +10,7 @@ class UserValidator {
   });
 
   create(data) {
-    return this.#schema.parse(data);
+    return this.#schema.omit({ id: true }).parse(data);
   }
 
   findById(data) {
