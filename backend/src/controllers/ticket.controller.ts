@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { Status } from "@prisma/client";
 import { TicketService } from "../services/ticket.service";
+import { Status } from "../utils/types";
 
 export class TicketController {
   private ticketService = new TicketService();

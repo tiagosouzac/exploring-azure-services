@@ -1,8 +1,8 @@
 import fs from "fs/promises";
 import { createError } from "../middlewares/error.middleware";
 import { prisma } from "../app";
-import { Status } from "@prisma/client";
 import { MulterOutFile } from "multer-azure-blob-storage";
+import { Status } from "../utils/types";
 
 export interface CreateMessageDTO {
   content: string;

@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import config from "../config";
 import { createError } from "./error.middleware";
-import { Role } from "@prisma/client";
 import { prisma } from "../app";
+import { Role } from "../utils/types";
 
 interface TokenPayload {
   id: string;

@@ -11,8 +11,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "sqlserver"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 // Modelo de Usuário: pode ser um cliente ou um atendente
@@ -21,7 +22,7 @@ model User {
   name      String
   email     String   @unique
   password  String
-  role      Role     @default(CLIENTE) // CLIENTE ou ATENDENTE
+  role      String   @default("CLIENTE") // CLIENTE ou ATENDENTE
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -33,34 +34,34 @@ model User {
 }
 
 // Enum para os papéis de usuário
-enum Role {
-  CLIENTE
-  ATENDENTE
-}
+// enum Role {
+//   CLIENTE
+//   ATENDENTE
+// }
 
 // Modelo de Ticket (Chamado)
 model Ticket {
   id          String    @id @default(uuid())
   title       String
   description String
-  status      Status    @default(ABERTO)
+  status      String    @default("ABERTO")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   closedAt    DateTime? // Data em que o chamado foi fechado
 
   // Relações
   userId   String // ID do cliente que abriu o chamado
-  user     User      @relation(fields: [userId], references: [id])
+  user     User      @relation(fields: [userId], references: [id], onUpdate: NoAction)
   messages Message[] // Mensagens deste chamado
 
   @@map("tickets")
 }
 
 // Enum para o status do chamado
-enum Status {
-  ABERTO
-  CONCLUIDO
-}
+// enum Status {
+//   ABERTO
+//   CONCLUIDO
+// }
 
 // Modelo de Mensagem
 model Message {
@@ -70,9 +71,9 @@ model Message {
 
   // Relações
   userId   String // Quem enviou a mensagem
-  user     User   @relation(fields: [userId], references: [id])
+  user     User   @relation(fields: [userId], references: [id], onUpdate: NoAction)
   ticketId String // Chamado ao qual a mensagem pertence
-  ticket   Ticket @relation(fields: [ticketId], references: [id])
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onUpdate: NoAction)
 
   // Anexos relacionados à mensagem
   attachments Attachment[]

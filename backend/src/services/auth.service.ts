@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../app";
 import config from "../config";
 import { createError } from "../middlewares/error.middleware";
-import { Role } from "@prisma/client";
+import { Role } from "../utils/types";
 
 export interface RegisterDTO {
   name: string;
@@ -38,7 +38,7 @@ export class AuthService {
       },
     });
 
-    const token = this.generateToken(user.id, user.role);
+    const token = this.generateToken(user.id, user.role as Role);
 
     return {
       user: {
@@ -67,7 +67,7 @@ export class AuthService {
       throw createError("Invalid credentials", 401);
     }
 
-    const token = this.generateToken(user.id, user.role);
+    const token = this.generateToken(user.id, user.role as Role);
 
     return {
       user: {

@@ -1,6 +1,6 @@
-import { Status } from "@prisma/client";
 import { prisma } from "../app";
 import { createError } from "../middlewares/error.middleware";
+import { Status } from "../utils/types";
 
 export interface CreateTicketDTO {
   title: string;
